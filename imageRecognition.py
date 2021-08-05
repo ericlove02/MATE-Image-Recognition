@@ -3,20 +3,24 @@ import pyautogui
 import cv2
 from PIL import Image, ImageDraw, ImageFont
 
+# take screenshot from rov vision software on-screen
 pyautogui.screenshot('image.jpg')
 
 font = cv2.FONT_HERSHEY_COMPLEX
 
+# set count of recognizable shapes to 0 for all
 tri = 0
 rect = 0
 line = 0
 circ = 0
 
+# mask the image to make shapes more apparent
 img = cv2.imread("image.jpg", cv2.IMREAD_GRAYSCALE)
 img = cv2.blur(img, (10,10))
 _, threshold = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)
 contours, hierarchy = cv2.findContours(threshold, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
+# loop through the shapes identified and use num corners to identify the shape
 for cnt in contours:
    approx = cv2.approxPolyDP(cnt, 0.01*cv2.arcLength(cnt, True), True)
    x = approx.ravel()[0]
@@ -41,6 +45,7 @@ for cnt in contours:
        if (18000 > area > 1300):
            line += 1
 
+# create ui for shape count output
 im = Image.new("RGB", (512,512), (255,255,255))
 fnt = ImageFont.truetype('arial.ttf', 40)
 d = ImageDraw.Draw(im)
